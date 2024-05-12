@@ -1,0 +1,11 @@
+version: '3'
+services:
+    haproxy:
+      image: haproxy:latest
+      container_name: haproxy
+      build:
+        context: ./haproxy/
+      ports:
+        - "80:80"
+        - "14567:14567"
+        - "1936:1936"

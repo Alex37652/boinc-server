@@ -1,0 +1,54 @@
+version: "3.4"
+
+volumes:
+  project:
+  results:
+  secrets:
+  logs:
+
+services:
+  makeproject:
+    image: boinc/server_makeproject:$VERSION$TAG$DEFAULTARGS
+    build: 
+      context: images/makeproject
+      target: makeproject$DEFAULTARGS
+      args:
+        - TAG
+        - BOINC_USER
+        - PROJECT_ROOT
+        - DB_HOST
+        - DB_REPLICA_HOST
+    volumes:
+      - "project:$PROJECT_ROOT.dst"
+      - "secrets:/run/secrets"
+    hostname: makeproject
+    environment:
+      - URL_BASE
+      - PROJECT
+
+  apache:
+    image: boinc/server_apache:$VERSION$TAG$DEFAULTARGS
+    container_name: apache
+    build: 
+      context: images/apache
+      target: apache$DEFAULTARGS
+      args:
+        - TAG
+        - BOINC_USER
+        - PROJECT_ROOT
+        - DB_HOST
+        - DB_REPLICA_HOST
+    hostname: $PROJECT
+    volumes: 
+      - "project:$PROJECT_ROOT"
+      - "results:/results"
+      - "secrets:/run/secrets"
+      - "/dev/null:/run/secrets/keys/code_sign_private"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "logs:/var/log/apache2"
+    ports: 
+      - "80:80"
+    tty: true
+    environment:
+      - URL_BASE
+      - PROJECT

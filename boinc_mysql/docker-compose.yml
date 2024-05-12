@@ -1,0 +1,15 @@
+version: "3.4"
+
+volumes:
+  mysql:
+
+services:
+  mysql:
+    image: boinc/server_mysql:latest
+    build: 
+      context: ./
+      target: mysql
+    volumes:
+      - "mysql:/var/lib/mysql"
+    ports:
+      - "3306:3306"
